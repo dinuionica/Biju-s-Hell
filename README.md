@@ -69,3 +69,52 @@ secondary array. As long as both arrays have elements, I've added mod
 alternately elements from the first and second arrays, respectively. In case of
 when one array has no more elements, all the elements in the other are added
 array in the final array of elements.
+
+Pseuocode used:
+
+void alternateMerge (v [], v1 [], v2 [], size1, size2)
+{
+     int i = 0, j = 0, size = 0;
+     // scroll through items in both arrays
+    while (i <size1 && j <size2)
+    {
+        v [size ++] = v1 [i ++];
+        v [size ++] = v2 [j ++];
+    }
+
+    // add the elements from the first array
+    while (i <size1)
+          v [size ++] = v1 [i ++];
+
+    // add the elements from the second array
+    while (j <size2)
+          v [size ++] = v2 [j ++];
+}
+
+### Task Bonus - cpuid
+
+In this task for solving the cpu_manufact_id function
+I called the cpuid function with the eax register set to 0. Then I added
+in turn, four characters from the three registers obtained later
+cpuid call (ebx, edx, ecx) in the final string transmitted as a parameter
+of the function.
+
+For the features function I set the eax register to 1 and
+I called cpuid. Then I tested the existence of the vmx by testing the bit
+5 of the ecx register, and if so I set the value to 1
+function parameter. Similarly, I tested the existence of rdrand
+Checking whether bit 30 of the register is set or not.
+For vax I checked if bit 28 of the ecx register is set
+and if so I set the parameter value to 1 because it exists
+obtaining vax.
+
+For the l2_cache_info function I called the cpuid function with the value
+80000006h in the eax register specifies Intel. Then I added
+ecx register on the stack to keep it unchanged, and I
+determined the value of the cache line that is represented by
+the first 8 bits of the ecx register. For total cache size
+I shifted 16 and accessed the last 16 bits it represents
+the desired value and I added the values obtained in the transmitted parameters
+function. For the operation of and I used & ff which represents
+a simulation of a bit mask. An f represents 4 bits of 1.
+Thus 0xff represents 8 bits of 1.
