@@ -39,9 +39,9 @@ To solve this task I chose to use a counter to keep
 evidence of parentheses. Iterates through the string transmitted as a parameter again
 if the current character is an open parenthesis the counter increases with
 value 1. If the current character is a closed parenthesis
-the counter decreases by 1. At the end of the program it is checked if the counter
+the counter decreases by 1. At the end of the program it is checked if the counter is 1.
 is 0, in which case the sequence is the correct parenthesis, and I return the value in the axis
-1. Otherwise the sequence is invalid and the eax register will have a value of 0. I tried
+Otherwise the sequence is invalid and the eax register will have a value of 0. I tried
 also the case where a closed parenthesis can be encountered before a
 open parentheses, this represents an invalid sequence of parentheses.
 
