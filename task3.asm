@@ -1,32 +1,31 @@
+section .data
+    ; delimitation used to separate words
+    word_delimiter db " .,", 10, 0
+
+section .text
 global get_words
 global sort
 global compare
+
 extern qsort
-extern printf
 extern strtok
 extern strlen
 extern strcmp
 
-section .data
-    delimitator db " .,", 10, 0
-
-section .text
-
-
 sort:
     enter 0, 0
-    mov ecx, [ebp + 8]  ; vector words
-    mov ebx, [ebp + 12] ; numar cuvinte
-    mov edx, [ebp + 16] ; valoare size
-  
-    push my_compare
+    ; array of words
+    mov ecx, [ebp + 8]
+    ; number of words
+    mov ebx, [ebp + 12]
+    ; size value of an element
+    mov edx, [ebp + 16]
     
+    ; adding parameters on the stack for calling the qsort function  
+    push my_compare
     push edx
-   
     push ebx
-   
     push ecx
-  
     call qsort
     add esp, 16
 
@@ -40,20 +39,21 @@ my_compare:
     push esi
     push ecx
 
-    mov edx, [ebp + 8] ; argument 1
-
-    mov ecx, [ebp + 12] ; argument 2
+    ; first string argument
+    mov edx, [ebp + 8]
+    ; second string argument 
+    mov ecx, [ebp + 12]
     
+    ; put the values ​​on the stack for strcmp function
     push dword [ecx]
+    push dword [edx]
 
-    push dword [edx] ; pun valorile pe stiva pentru strcmp 
-
-
+    ; determining the length of the first string received as an argument
     push dword [edx]
     call strlen
     add esp, 4
-    ; mov esi, eax ; pun in esi lungime argument 1
-
+    
+    ; within the eax register is the length of the first string
     push eax
 
     mov ecx, [ebp + 12]
@@ -61,64 +61,77 @@ my_compare:
     call strlen
     add esp, 4
 
+    ; within the eax register is the length of the second string,
+    ; and the value moves to the ecx register
     mov ecx, eax
 
+    ; the length of the first string is taken from the stack
+    ; and is determined the difference between the two lengths 
     pop eax
-
     sub eax, ecx
 
-    je call_strcmp ; daca sunt egale apelez qsort
-    jmp free_stack
+    ; if the two lengths are equal, call the strcmp function
+    je call_strcmp 
+
+    jmp ending
 
 call_strcmp:
        
     call strcmp
       
-free_stack:
+ending:
+      ; free the stack and return 
       add esp, 8
       pop ecx
       pop esi
 
-final:
       leave
       ret
 
-
 get_words:
+
     enter 0, 0
+
+    ; the string
     mov eax, [ebp + 8]
+    ; the address of the array with words
     mov ebx, [ebp + 12]
+    ; the number of words
     mov edi, [ebp + 16]
   
-
-    push delimitator
+    ; adding parameters on the stack for calling the strtok function  
+    push word_delimiter
     push eax
     call strtok
     add esp, 8
-    mov [ebx + 0], eax
-  
 
+    ; add the word obtained after the strtok call in the final array
+    mov [ebx + 0], eax
+    
+    ; initializing the counter used for loop
     xor edx, edx
     mov edx, 1
 
 loop:
+
+    ; adding the counter to the stack
     push edx
     
-    push delimitator
+    ; adding parameters on the stack for calling the strtok function  
+    push word_delimiter
     push 0
     call strtok
     add esp, 8
     
+    ; access the current counter and add the word obtained after the
+    ; strtok call in the final array of words
     pop edx
+    mov [ebx + edx * 4], eax 
 
-    mov [ebx + edx * 4], eax  ; pun stringul mic in ebx
-
+    ; incrementthe counter and continue the iteration
     inc edx
     cmp edi, edx
     jg loop
 
-final_loop:
     leave
     ret
-
-

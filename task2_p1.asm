@@ -1,49 +1,49 @@
-%include "../../utils/printf32.asm"
-
 section .text
 	global cmmmc
-    extern printf
 
-;; int cmmmc(int a, int b)
-;
-;; calculate least common multiple fow 2 numbers, a and b
 cmmmc:
+    ; adding items to the stack
     push ebp
-   
     push eax
     push edx
 
 gcd:   
-    cmp     edx, eax                 ; edx = valoarea cea mai mica
-    je final_result
-    jle substract
-    push eax    ; interschimbare daca nu sunt in ordinea corecta
+    ; the two numbers are compared, the lowest value being in the edx register
+    ; and is determined the value of gdc using the Euclidean algorithm 
+    cmp edx, eax   
+    je calculate_lcm
+    jle difference
+
+    ; if the two elements are not in the desired order,
+    ; the values ​​are exchanged using the stack
+    push eax 
     push edx
     pop eax
     pop edx
 
-substract:   
-    sub     eax,edx                 ; diferenta
-    jne     gcd                     ; continua loop
-;                     
+difference:  
+    ; make the difference between the two numbers
+    sub eax,edx     
+    ; continue the algorithm           
+    jne gcd     
 
-final_result:
+calculate_lcm:
 
-    pop edx
-                        ; in eax am cmmdc
+    ; accessing the number from the stack
+    pop edx 
+    ; within the eax register there is the gdc value of the two numbers
     push eax
-    pop ecx             ; in ecx am cmmdc
+    ; the value is added to the ecx register (gdc)
+    pop ecx
     
-
+    ; the product of the two numbers is determined in the eax register 
     pop eax
+    mul edx           
 
-
-    mul edx             ; in eax se determina produsul
-
-   
+    ; the final value for lcm is obtained in the eax register by
+    ; dividing the product by gdc (lcm  = (a * b) / gdc)
     xor edx, edx
-    div ecx           ;   in eax am impartirea finala
+    div ecx 
   
     pop ebp
     ret
-

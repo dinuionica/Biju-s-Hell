@@ -1,62 +1,68 @@
-%include "../../utils/printf32.asm"
-
-
 section .text
 	global par
-	extern printf
 
-;; int par(int str_length, char* str)
-;
-; check for balanced brackets in an expression
 par:
-	
+
 	push ebp 
 
-	;PRINTF32 `%d\n\x0`, edx	; lungime string
-	;PRINTF32 `%s\n\x0`, eax	; string 
-
+	; initializing the counter used for iteration of the string
 	xor ecx, ecx
-	xor ebx, ebx		; contor 
+	; initialization of the counter used to keep track of parentheses
+	xor ebx, ebx
 
-for:
+string_iteration:
 
-	cmp ebx, 0  ; daca am o paranteza ) inainte de una (
+	; if there is a closed parenthesis ) before an open one ( is 
+	; returned a false answer because it is not a correct sequence.
+	cmp ebx, 0
 	jl final_result
 
+	; if the current character is an open parenthesis,
+	; the ebx counter is incremented
 	cmp byte [eax + ecx], '('
 	je increment
 
+	; if the current character is an closed parenthesis,
+	; the ebx counter is decremented
 	cmp byte [eax + ecx], ')'
 	je decrement 
-	inc ecx
-	cmp ecx, edx
-	jl for
-	jmp final_result
+	jmp continue_iteration
 
 increment:
+
+	; apply an increment and continue the iteration
 	inc ebx
-	inc ecx
-	cmp ecx, edx
-	jl for
-	jmp final_result
+	jmp continue_iteration
 
 decrement:
+
+	; apply a decrement and continue the iteration
 	dec ebx
+	jmp continue_iteration
+
+continue_iteration:
+
+	; continue the iteration through each character of the string
 	inc ecx
 	cmp ecx, edx
-	jl for
+	jl string_iteration
 	jmp final_result
 
-
 final_result:
-	xor eax, eax
-	cmp ebx, 0 ; daca contorul este 0, inseamna ca parantezele sunt corecte
-	je put_1
-	jmp final
 
-put_1:
+	; if the counter is 0, it means that the parentheses are correct
+	xor eax, eax
+	cmp ebx, 0
+	; updates the value of the eax register by 1 for a correct sequence
+	; otherwise the value remains 0 for an invalid sequence
+	je update_eax
+	jmp ending
+
+update_eax:
+
+	; updates the value of the eax register by 1 for a correct sequence
 	add eax, 1
 
-final:
+ending:
 	pop ebp
 	ret

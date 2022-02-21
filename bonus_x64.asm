@@ -1,84 +1,97 @@
 section .text
 	global intertwine
 
-; rcx -> n1
-; rax -> v1
-; rsi -> n2
-; rdx -> v2
-; rbx -> v
 intertwine:
 	
+    enter 0,0
 
-    enter 0,0	; set up stack frame, must be alligned
+	; initialization of counters for accessing the elements within the arrays
+	xor r11, r11
+	xor r12, r12	
+	xor r13, r13
 
+check_first_condition:
 
-	xor r11, r11; asta o sa fie i
-	xor r12, r12; asta o sa fie j
-	xor r13, r13; asta o sa fie k
-
-continue:
+	; check if the first array still has elements
 	cmp r11, rcx
-	jl posibil_while_mare
+	jl check_second_condition
 
-	jmp while_mici
+	; if the condition is not met it means that an array has no more 
+	; elements and the secondary loops are performed
+	jmp secondary_loops
 
+check_second_condition:
 
-posibil_while_mare:
-
+	; check if the first array still has elements
 	cmp r12, rsi 
-	jl while_1
-	jmp while_mici
-
-while_1:
-
-	mov dword edi, [rax + r11 * 4]
-
-
-	mov dword [r8 + r13 * 4], edi
-
-
+	jl first_loop
 	
+	; similarly, an array has length 0
+	jmp secondary_loops
+
+first_loop:
+
+	; add the elements from the two secondary arrays
+	; alternately in the final array at the desired position
+
+	; v[size++] = v1[i++]
+	mov dword edi, [rax + r11 * 4]
+	mov dword [r8 + r13 * 4], edi
+	; increment the counters
 	inc r13
 	inc r11
 	
-	;arr3[k++] = arr2[j++]
+	; v[size++] = v2[j++]
 	mov dword edi, [rdx + r12 * 4]
 	mov dword [r8 + r13* 4], edi
+	; increment the counters
 	inc r13
 	inc r12
 	
-	jmp continue
+	; continue the iteration by checking the first condition again
+	jmp check_first_condition
 	
+secondary_loops:
 
+	; if a array has length 0, all elements of the remaining array that
+	; contains elements are added to the final array
 
-while_mici:
+	; if the first array is large
 	cmp r11, rsi
-	jl n1_mare
+	jl lengt1_large
 
+	; if the first array is large
 	cmp r12, rcx
-	jl n2_mare
+	jl lengt2_large
 
-	jmp final
+	jmp ending
 
-n1_mare:
+lengt1_large:
+
+	; add all the elements from the first array to the final array
+	; v[size++] = v1[i++]
 	xor edi, edi
-	;arr3[k++] = arr1[i++];	
 	mov dword edi, [rax + r11 * 4]
 	mov dword [r8 + r13 * 4], edi
 	inc r13
 	inc r11
 
-	jmp while_mici	
+	; continue the iteration
+	jmp secondary_loops	
 
-n2_mare:
+lengt2_large:
+
+	; add all the elements from the first array to the final array
+	; v[size++] = v2[j++]
 	xor edi, edi
-	;arr3[k++] = arr2[j++]
 	mov dword edi, [rdx + r12 * 4]
 	mov dword [r8 + r13 * 4], edi
 	inc r13
 	inc r12
-	jmp while_mici	
 
-final:
+	; continue the iteration
+	jmp secondary_loops	
+
+ending:
 	leave
-	ret			; return
+	ret
